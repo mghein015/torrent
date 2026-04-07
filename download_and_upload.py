@@ -15,13 +15,15 @@ def download_and_upload(link, repo_id, token):
     # --seed-time=0: Stop immediately after download finishes
     # --summary-interval=10: Print progress every 10 seconds (cleaner logs)
     # --dht-entry-point: Help find peers in cloud networks
+# Corrected aria2c flags
     cmd = [
         "aria2c",
         "--dir", save_path,
-        "--seed-time", "0",
-        "--summary-interval", "10",
-        "--bt-enable-lpd", "true",
-        "--enable-dht", "true",
+        "--seed-time=0",
+        "--summary-interval=10",
+        "--bt-enable-lpd=true",
+        "--enable-dht=true",
+        "--follow-torrent=mem",
         link
     ]
 
