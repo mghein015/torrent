@@ -9,24 +9,24 @@ def download_and_upload(link, repo_id, token):
     ses = lt.session({'listen_interfaces': '0.0.0.0:6881'})
     
     save_path = os.path.abspath('./downloads')
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
+    os.makedirs(save_path, exist_ok=True)
 
+    # Bulletproof parameter handling (No dictionaries)
     if link.startswith("magnet:?"):
         params = lt.parse_magnet_uri(link)
-        params.save_path = save_path  # Use dot notation for objects
+        params.save_path = save_path
     else:
         info = lt.torrent_info(link)
-        params = {
-            'ti': info,
-            'save_path': save_path
-        }
+        params = lt.add_torrent_params()
+        params.ti = info
+        params.save_path = save_path
 
     handle = ses.add_torrent(params)
     
     print(f"Starting download to: {save_path}")
     
     # Wait for metadata
+    print("Fetching metadata...")
     while not handle.has_metadata():
         time.sleep(1)
     
@@ -62,6 +62,6 @@ def download_and_upload(link, repo_id, token):
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
-        print("Usage: python script.py <link> <repo_id> <token>")
+        print("Usage: python download_and_upload.py <link> <repo_id> <token>")
     else:
         download_and_upload(sys.argv[1], sys.argv[2], sys.argv[3])
