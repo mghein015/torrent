@@ -1,0 +1,34 @@
+name: Torrent to Hugging Face
+
+on:
+  workflow_dispatch:
+    inputs:
+      torrent_link:
+        description: 'Magnet link or .torrent URL'
+        required: true
+      hf_repo:
+        description: 'HF Repo (e.g., username/my-dataset)'
+        required: true
+
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-libtorrent
+          pip install huggingface_hub
+
+      - name: Run Script
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          mkdir -p downloads
+          python3 download_and_upload.py \
+            "${{ github.event.inputs.torrent_link }}" \
+            "${{ github.event.inputs.hf_repo }}" \
+            "$HF_TOKEN"
